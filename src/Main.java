@@ -1,3 +1,17 @@
+/**
+ * Lihtne konsoolipohine laevade pommitamise mang
+ * @author Brita Pentsuk
+ * @version 1.0
+ * Inspiratsiooni on saadud Krister Viirsaare koodist, mis asub videona aadressil
+ * @see <a href="https://www.youtube.com/watch?v=WZdx5IJKuPE">Krister Viirsaare naide</a>
+ */
+
+// 0 - laevata koordinaat
+// 1 - pommitamata laev
+// 2 - pommitatud laev
+// 3 - pommitatud laevata koordinaat
+
+// Vajaminevate moodulite importimine
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -5,44 +19,38 @@ public class Main {
 
     public static void main(String args[]) {
 
-        /**
-         * @author Brita Pentsuk
-
-         * Inspiratsiooni on saadud Krister Viirsaare koodist, mis asub videona aadressil
-         * https://www.youtube.com/watch?v=WZdx5IJKuPE
-         */
-
-        // Mängulaua algseis ja mängijale nähtav osa
+        // Mangulaua nahtamatu ja mangijale nahtava massiivi loomine
         int[][] playgroundAtFirst = new int[3][3];
         int[][] playgroundAtNow = new int[3][3];
 
-        // 0 - meri, kus laeva pole
-        // 1 - pommitamata laev
-        // 2 - pihta saanud laev
-        // 3 - pommitatud positsioon, kus laeva pole
+        // Sissejuhatuse kuvamine kasutajale
+        System.out.println("======LAEVADE POMMITAMINE======\n");
+        System.out.println("Mangu kaart on mootkavas " + playgroundAtFirst.length + " * " + playgroundAtFirst[0].length + " ruutu");
+        System.out.println("Kaardi tingmargid:\n 0 - meri\n 2 - uputatud laev\n 3 - moodaheidetud pomm\n");
 
-        System.out.println("LAEVADE POMMITAMINE\n");
-        System.out.println("Mängu kaart on mõõtkavas " + playgroundAtFirst.length + " (X/horisontaaltelg) * " + playgroundAtFirst[0].length + " (Y/vertikaaltelg) ruutu");
-        System.out.println("Kaardi tingmärgid:\n 0 - meri\n 2 - uputatud laev\n 3 - mööda heidetud pomm\n");
-        // Katsete arv
+        // Pommituste arvu loendur
         int attemptCount = 0;
-        // Laevade arv maatriksil
+
+        // Laevade arvu loendur massiivis
         int shipCount = 0;
-        // Programmi käivitamise aeg
+
+        // Programmi kaivitamise algusaeg
         long startTime = System.currentTimeMillis();
+
+        // Muutuja "hit" (laeva tabamus) defineerimine erindi tootlemise tarbeks
         int hit = 0;
 
-        // Määrab ära kaks tsüklit teineteise sees, et saaks igat punkti eraldi määratleda ehk 1x2 laevad
+        /* Nested (Yksteise sees asuvad) for-tsyklid, millega kaiakse yle kahemootmeline massiiv ja paigutatakse
+        laevad juhuslikele koordinaatidele (massiivi indeksitele)
+        */
         for (int i = 0; i < playgroundAtFirst.length; i++) {
             for (int j = 0; j < playgroundAtFirst[i].length; j++) {
-                playgroundAtFirst[i][j] = (int) (Math.random() * 1.5); // (int) hoolitseb selle eest, tagastatud
-                                                                     // komakohaga väärtusel n.ö raiutakse komakoht ära
-                                                                     // Math.random() tagastab umbes pooleks 0-id ja 1-d
-                                                                     // mida väiksem number, seda vähem 1-d e laevu, võib olla nt 1.3
+                // Juhusliku taisarvulise vaartuse andmine koordinaadile. Suurem number = suurem toenaosus
+                playgroundAtFirst[i][j] = (int) (Math.random() * 1.5);
             }
         }
 
-        // Arvutab laevade hulga maatriksil
+        // Nested (yksteise sees asuvad) for-tsyklid, millega loetakse kahemootmelisest massiivist laevade hulk
         for (int i = 0; i < playgroundAtFirst.length; i++) {
             for (int j = 0; j < playgroundAtFirst[i].length; j++) {
                 if (playgroundAtFirst[i][j] == 1) {
@@ -50,62 +58,88 @@ public class Main {
                 }
             }
         }
-        // Käivitatakse väline meetod PrintPlayground talle omastatud andmetega
+
+        // Kutsutakse valja meetod, mis kuvab kasutajale nahtava kaardi (massiivi)
         PrintPlayground(playgroundAtNow);
 
-        // Suuname andmed skännerobjektile, kasutajalt sisendi saamiseks
+        // Skannerobjekti loomine kasutaja sisendi saamiseks
         Scanner sc = new Scanner(System.in);
 
-        //Mängu while-tsükkel, mis töötab nii kaua, kuni break-käsuni
+        // Mangu pohiloogika, mis toimib kuni break voi vea ilmnemisel exit kaskluseni
         while (true) {
-            System.out.println("\nMäära pommi heitmise koordinaadid formaadis x-y");
-            attemptCount++;                                        // Katsete loenduri suurendamine
-            String input = sc.nextLine();                            // Kasutajalt sisendi küsimine
-            String[] xy = input.split("-");                   // Poolitab x-y string kaheks osaks
-            int x = Integer.parseInt(xy[0]) - 1;                    // Muudab string int-iks
-            int y = Integer.parseInt(xy[1]) - 1;                    // Muudab string int-iks
-            try {
-                hit = playgroundAtFirst[y][x];              // Küsib x-y positsioonilt numbrit
-            } catch(ArrayIndexOutOfBoundsException e) {
-                System.out.println("Vigane sisestus");
+
+            System.out.println("\nMaara pommi heitmise koordinaadid formaadis X-Y");
+
+            // Pommituste loenduri suurendamine
+            attemptCount++;
+
+            // Kasutajalt sisendi kysimine
+            String input = sc.nextLine();
+
+            /* Kasutaja sisendi formaadi kontroll; regulaaravaldis kontrollib, kas rea alguses on yks number,
+            siis sidekriips, seejarel taas yks number ning rea lopp
+            */
+            if (input.matches("^(\\d-\\d)$") == false){
+                System.out.println("Vigane sisestus!");
                 System.exit(1);
             }
-                if (hit == 1) {                                 // Kui tabamus on 1, st laev sai pihta, siis salvestatakse
-                playgroundAtFirst[y][x] = 2;                    // tabamus mängulauale
-                playgroundAtNow[y][x] = 2;                    // ja kuvatakse ka mängijale
-                System.out.println("Pihtas-põhjas!");
-            } else if (hit == 0) {                          // Kui tabamus on 0, st laev ei saanud pihta, siis kuvatakse
-                playgroundAtFirst[y][x] = 3;
-                playgroundAtNow[y][x] = 3;                   // mängijale sellele kohale nr 3 (taustlauale pole vaja märkida)
-                System.out.println("Tabamus läks mööda!");
-            } else if (hit == 2 || hit == 3) {                          // Kui ühte ja sama kohta on juba korduvalt pommitatud
-                System.out.println("Seda kohta oled juba pommitanud!");
+
+            // Poolitab x-y stringi kaheks osaks
+            String[] xy = input.split("-");
+
+            // Konverteeritud (casting) stringid taisarvudeks (int)
+            int x = Integer.parseInt(xy[0]) - 1;
+            int y = Integer.parseInt(xy[1]) - 1;
+
+            // Erindi kontroll juhuks, kui kasutaja sisend on suurem kui massiivi pikkus
+            try {
+                // Kysib x-y positsioonilt numbrit
+                hit = playgroundAtFirst[y][x];
+            } catch(ArrayIndexOutOfBoundsException e) {
+                System.out.println("Vigane sisestus!");
+                System.exit(1);
             }
 
-            PrintPlayground(playgroundAtNow); // Iga mänguga kuvatakse mängijale uus mängulaud
+            // Laev saab pihta, maaratakse pommitatuks
+                if (hit == 1) {
+                playgroundAtFirst[y][x] = 2;
+                playgroundAtNow[y][x] = 2;
+                System.out.println("Pihtas-pohjas!");
+             // Laevale ei saa pihta
+            } else if (hit == 0) {
+                playgroundAtFirst[y][x] = 3;
+                playgroundAtNow[y][x] = 3;
+                System.out.println("Ei tabanud!");
+            // Yhe ja sama koordinaadi korduv pommitamine
+            } else if (hit == 2 || hit == 3) {
+                System.out.println("Seda koordinaati oled juba pommitanud!");
+            }
 
-            // Kontrollib kogu mängulaua pikkuses, kas mäng võib olla läbi: sellisel juhul,
-            // kui mõni allesolev laev leitakse, mäng ei saa läbi veel olla
+            // Kutsutakse valja meetod uuendatud mangulaua kuvamiseks
+            PrintPlayground(playgroundAtNow);
+
+            // Kutsub valja meetodi kontrollimaks, kas mang on loppenud (koik laevad pommitatud)
             boolean over = GameOver(playgroundAtFirst); //
             if  (over == true) {
                 break;
             }
         }
 
-        // Programmi töö kestvus
+        // Programmi too kestvuse arvutamine minutites ja sekundites (jagatise jaak - %)
         long runTime = (System.currentTimeMillis() - startTime) / 1000;
         int runTimeMin = (int)runTime/60;
         int runTimeSec = (int)runTime%60;
 
-
-        System.out.println("VÕITSID!");
-        System.out.println("Pomme heidetud: " + attemptCount);
-        System.out.println("Heitmise täpsus: " + Math.round((double)shipCount*100/attemptCount) + "%");
-        System.out.println("Mängu kestvus: " + runTimeMin + " minutit ja " + runTimeSec + " sekundit");
+        // Loppkokkuvotte kuvamine kasutajale
+        System.out.println("\n===VoITSID===");
+        System.out.println("Heidetud pomme: " + attemptCount);
+        System.out.println("Tabamusi: " + Math.round((double)shipCount*100/attemptCount) + "%");
+        System.out.println("Mangu kestvus: " + runTimeMin + " minutit ja " + runTimeSec + " sekundit");
     }
 
-    // boolean - lõpuks tagastatakse meetodi tulemus, siinkohal korduvalt false ja lõpuks true
-    // meetod võtab sisendiks maatriksi(?), nimetame selle "playgroundFirst" muutujaks
+    /*Meetod, mis kontrollib, kas manguvaljal (massiivis) on alles moni pommitamata laev
+    True = koik pommitatud; mang voidetud. False = moni pommitamata; mang jatkub
+    */
     private static boolean GameOver(int[][] playgroundOver) {
         for (int i = 0; i < playgroundOver.length; i++) {
             for (int j = 0; j < playgroundOver[i].length; j++) {
@@ -113,15 +147,14 @@ public class Main {
                     return false;
                 }
             }
-
         }
         return true;
     }
 
+    // Meetod, mis kuvab mangukaardi
     public static void PrintPlayground(int[][] playground) {
         for (int i = 0; i < playground.length; i++) {
             System.out.println(Arrays.toString(playground[i]));
         }
     }
-
 }
