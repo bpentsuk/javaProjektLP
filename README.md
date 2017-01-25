@@ -1,15 +1,15 @@
 # Laevade pommitamine
 
-Autor: Brita Pentðuk
+Autor: Brita Pentsuk
 
 Inspiratsiooniks kasutasin Krister Viirsaare loodud programmikoodi, mis asub videona aadressil https://www.youtube.com/watch?v=WZdx5IJKuPE ning mida omalt poolt muutsin ja täiendasin.
 
 Mängijale kuvatakse massiivide abil fikseeritud suurusega mänguväljak ning hakatakse küsima pommitamiseks vajalikke koordinaate (x, y).
 
 Antud on mängulaua tingimused:
-0 - tähistab veel pommitamata merd
-2 - tähistab pihta saanud laeva
-3 - tähistab pommitatud ala, millel laeva ei asunud.
+* 0 - tähistab veel pommitamata merd
+* 2 - tähistab pihta saanud laeva
+* 3 - tähistab pommitatud ala, millel laeva ei asunud.
 
 Vale sisestuse puhul kuvatakse kasutajale veateade ning lõpetatakse mäng. Ühe ja sama koordinaadi korduval pommitamisel antakse sellest mängijale märku.
 
